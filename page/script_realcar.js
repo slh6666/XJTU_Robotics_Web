@@ -220,7 +220,7 @@ function updateAlgorithmDescription() {
             `;
             break;
             
-        case 'Teb':
+        case 'TEB':
             algorithmDescription.innerHTML = `
             TEB（Time Elastic Band）算法是一种局部路径规划方法，主要用于移动机器人在动态环境中的避障和路径优化。
             它通过时间弹性带的概念来表示机器人的轨迹，允许机器人在保持连续性和平滑性的同时，动态地调整运动轨迹以避开障碍物。
@@ -241,3 +241,32 @@ document.getElementById('algorithmSelect').addEventListener('change', updateAlgo
 
 // 初始化算法介绍
 updateAlgorithmDescription();
+
+
+/*地图坐标点击选择逻辑部分 */
+const mapContainer = document.getElementById('mapContainer');
+var startCoordInput = document.getElementById('startCoord');
+var endCoordInput = document.getElementById('endCoord');
+
+//为地图容器添加点击事件监听器
+mapContainer.addEventListener('click', function(event) {
+    const rect = clickLayer.getBoundingClientRect();
+    // const x = event.clientX - rect.left *(10/729); // 获取点击的X坐标
+    // const y = (event.clientY - rect.top) *(10/540);  // 获取点击的Y坐标
+    const x = parseFloat(((event.clientX - rect.left) *(27/729)).toFixed(2));;
+    const y = parseFloat(((event.clientY - rect.top) * (20/540)).toFixed(2)); 
+    if (activeInput) {
+        activeInput.value = `${x},${y}`;
+    }
+});
+const clickLayer = document.getElementById('clickLayer');
+let activeInput = null; // 当前激活的输入框
+
+// 为起点和终点输入框添加点击事件监听器
+startCoordInput.addEventListener('click', function() {
+    activeInput = startCoordInput;
+});
+
+endCoordInput.addEventListener('click', function() {
+    activeInput = endCoordInput;
+});
