@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>规划算法仿真实验平台</title>
+    <link rel="stylesheet" href="styles_simulation.css">
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <li><a href="home.html" class="nav-link">主页</a></li>
+            <li><a href="pythonRobotics.html" class="nav-link">仿真实验</a></li>
+            <li><a href="realCar.html" class="nav-link">实车实验</a></li>
+        </ul>
+    </div>
+    <div class="container">
+        <div class="header-logo">
+            <img src="../images/xjtu_logo.png" alt="西安交通大学校徽" class="university-logo" width="100" height="80">
+        </div>
+        <div class="header-title">
+            <h1>规划算法仿真实验平台</h1>
+        </div>
+        <div class="content-wrapper">
+            <div class="experiment-setup-and-area">
+                <div class="experiment-setup">
+                    <label for="algorithmSelect">选择算法:</label>
+                    <select id="algorithmSelect" class="input-field-algorithmSelect">
+                        <option value="Dijkstra">Dijkstra</option>
+                        <option value="A*">A*</option>
+                        <option value="PRM">PRM</option>
+                        <option value="RRT">RRT</option>
+                    </select>
+                    <label for="mapSelect">选择地图:</label>
+                    <select id="mapSelect" class="input-field-algorithmSelect">
+                        <option value="map0">map1</option>
+                        <option value="map1">map2</option>
+                        <option value="map2">map3</option>
+                        <option value="map3">map4</option>
+                        <option value="map4">map5</option>
+                        <option value="map5">map6</option>
+                        <option value="map6">map7</option>
+                        <option value="map7">map8</option>
+                        <option value="map8">map9</option>
+                        <option value="map9">map10</option>
+                        <option value="map10">map11</option>
+                        <option value="map11">map12</option>
+                    </select>
+                    <div class="coord-labels">
+                        <label for="startCoord">起点坐标:</label>
+                        <label for="endCoord">终点坐标:</label>
+                    </div>
+                    <div class="coord-inputs">
+                        <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" >
+                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" >
+                        <!-- <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" value="0,0">
+                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" value="10,10"> -->
+                    </div>
+            
+                    
+                </div>
+                
+                <div class="algorithm-description">
+                    <h2>算法介绍</h2>
+                    <p id="algorithmDescription"></p>
+                </div>
+                <div class="experiment-area">
+                    <h2>实验区域</h2>
+                    
+                    <div id="animation-container">
+                        <div id="mapContainer" style="display: none;">
+                            <img src="../maps/map0.png" alt="地图" class="map-image">
+                            <div id="clickLayer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="code-display">
+                <h2>代码展示区</h2>
+                <button id="mapActionButton"  class="action-button">加载地图</button>
+                <button id="runButton" onclick="runExperiment()" class="action-button">运行实验</button>
+                <pre><code id="codeDisplay" class="language-python"># 这里将显示代码
+    # 示例代码
+    def hello_world():
+        print("Hello, World!")
+        print("Hello, World!")
+        print("Hello, World!")
+        print("Hello, World!")
+        print("Hello, World!")
+        print("Hello, World!")
+        print("Hello, World!")
+    </code></pre>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/paho-mqtt@1.1.0/paho-mqtt-min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.7.0/two.min.js"></script> 
+    <script src="script_simulation.js"></script>
+</body>
+</html>

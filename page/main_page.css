@@ -1,0 +1,69 @@
+/* 主页样式表部分*/
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    overflow: auto;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar li a {
+    text-decoration: none;
+    color: white;
+    background-color: #444;
+    padding: 10px;
+    display: block;
+    transition: background-color 0.3s;
+    border-radius: 8px;
+}
+
+.sidebar li a:hover, .sidebar li a.active {
+    background-color: #555;
+}
+
+.content-container {
+    margin-left: 240px; /* 留出侧边栏的空间 */
+    padding: 20px;
+    transition: margin-left 0.3s;
+}
+.header-container {
+    display: flex;
+    align-items: center; /* 确保图片和标题在垂直方向上居中对齐 */
+    justify-content: center; /* 确保标题在容器中居中 */
+    position: relative; /* 设置相对定位 */
+}
+
+.header-image {
+    width: 100px; /* 设置图片宽度 */
+    height: auto; /* 保持宽高比 */
+    margin-right: 20px; /* 在图片和标题之间添加空间 */
+}
+
+/* 如果您想要图片固定在左上角，您可以为图片使用绝对定位 */
+.header-image {
+    position: absolute; /* 设置绝对定位 */
+    left: 0; /* 距离容器左边界0距离 */
+    top: -1; /* 距离容器顶部边界0距离 */
+    width: 100px; /* 或者使用 max-width: 100px; */
+    height: auto; /* 保持图片的宽高比 */
+}/* 可以添加更多的样式来美化侧边栏和页面内容 */
