@@ -24,14 +24,13 @@ function runExperiment() {
     animationContainer.appendChild(mapContainer);
     
     if(isRunning){
-        //resultDetails.innerHTML = '结果将显示在这里...';
         // 或者，更简单的方法是先清空所有子元素，然后再把mapContainer加回去
         
         runButton.textContent = '运行实验';
         isRunning = false;
         
-        document.getElementById('startCoord').value = '';
-        document.getElementById('endCoord').value = '';
+        // document.getElementById('startCoord').value = '';
+        // document.getElementById('endCoord').value = '';
         return;
     }
     else{
@@ -101,9 +100,12 @@ function runExperiment() {
                     console.log("解析后的数据: ", data);
                     
                     // 解析 JSON 数据
-                    const { 起点, 目标点, 障碍物, 车辆行使路径 } = data;
-
-                    // 初始化 Two.js
+                    const { 起点, 目标点, 障碍物, 车辆行使路径 , path} = data;
+                    if(path == 0){
+                        alert("路径规划失败，请重新指定起点终点！");
+                    }
+                    else if(path == 1){
+                        // 初始化 Two.js
                     // 创建并添加 canvas 元素
                     const elem = document.getElementById('animation-container');
                     
@@ -160,6 +162,8 @@ function runExperiment() {
 
                     // 标记为已绘制
                     hasDrawn = true;
+                    }
+                    
 
                 } catch (e) {
                     console.error("JSON ERROR: ", e);
