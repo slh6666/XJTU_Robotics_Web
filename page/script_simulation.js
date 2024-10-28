@@ -9,7 +9,7 @@ function runExperiment() {
     // 获取需要保留的元素
     const mapContainer = document.getElementById('mapContainer');
     let hasDrawn = false;
-    //var selectedAlgorithm = document.getElementById('algorithmSelect').value;
+    var selectedAlgorithm = document.getElementById('algorithmSelect').value;
     var startCoord = document.getElementById('startCoord').value.split(',').map(Number);
     console.log("起点: ", startCoord);
     var endCoord = document.getElementById('endCoord').value.split(',').map(Number);
@@ -30,8 +30,8 @@ function runExperiment() {
         runButton.textContent = '运行实验';
         isRunning = false;
         
-        startCoordInput = '';
-        endCoordInput = '';
+        document.getElementById('startCoord').value = '';
+        document.getElementById('endCoord').value = '';
         return;
     }
     else{
@@ -39,7 +39,7 @@ function runExperiment() {
         runButton.textContent = '重置实验';
             
         // 创建 MQTT 客户端
-        const client = new Paho.Client("192.168.1.107", 8083, "clientId-" + Math.random());
+        const client = new Paho.Client("192.168.1.111", 8083, "clientId-" + Math.random());
 
         // 设置回调函数
         client.onConnectionLost = onConnectionLost;
@@ -147,10 +147,10 @@ function runExperiment() {
                         if (currentIndex < 车辆行使路径.length - 1) {
                             const [x1, y1] = 车辆行使路径[currentIndex];
                             const [x2, y2] = 车辆行使路径[currentIndex + 1];
-                            vehicle.translation.set(x2 * scaleFactor+13, (20-y2) * scaleFactor+13);
+                            vehicle.translation.set(x2 * scaleFactor+13, y2 * scaleFactor+13);
 
                             // 绘制线段
-                            const line = two.makeLine(x1 * scaleFactor+13, (20-y1) * scaleFactor+13, x2 * scaleFactor+13, (20-y2) * scaleFactor+13);
+                            const line = two.makeLine(x1 * scaleFactor+13, y1 * scaleFactor+13, x2 * scaleFactor+13, y2 * scaleFactor+13);
                             line.stroke = 'black';
                             line.linewidth = 2;
 
@@ -330,73 +330,158 @@ function updateCodeDisplay() {
             `
             break;
         case 'A*':
-            codeDisplay.textContent = `
-            def heuristic(a, b):
-            """使用曼哈顿距离作为启发式函数"""
-            return abs(b[0] - a[0]) + abs(b[1] - a[1])
+            codeDisplay.textContent = `def heuristic(a, b):
+    """使用曼哈顿距离作为启发式函数"""
+    return abs(b[0] - a[0]) + abs(b[1] - a[1])
+
+def a_star_search(start, goal, graph):
+    """A*算法实现"""
+    # 开放列表，用于存储待处理的节点，元素格式为(成本, 节点)
+    open_list = []
+    # 将起点加入开放列表
+    heapq.heappush(open_list, (0, start))
+    
+    # 关闭列表，用于存储已经处理过的节点
+    closed_list = set()
+    
+    # 记录每个节点的父节点，用于最后重建路径
+    came_from = {}
+    
+    # 记录每个节点到达的最低成本
+    cost_so_far = {start: 0}
+    
+    while open_list:
+        # 从开放列表中取出成本最低的节点
+        _, current = heapq.heappop(open_list)
         
-        def a_star_search(start, goal, graph):
-            """A*算法实现"""
-            # 开放列表，用于存储待处理的节点，元素格式为(成本, 节点)
-            open_list = []
-            # 将起点加入开放列表
-            heapq.heappush(open_list, (0, start))
-            
-            # 关闭列表，用于存储已经处理过的节点
-            closed_list = set()
-            
-            # 记录每个节点的父节点，用于最后重建路径
-            came_from = {}
-            
-            # 记录每个节点到达的最低成本
-            cost_so_far = {start: 0}
-            
-            while open_list:
-                # 从开放列表中取出成本最低的节点
-                _, current = heapq.heappop(open_list)
-                
-                # 如果到达目标节点，重建并返回路径
-                if current == goal:
-                    path = []
-                    while current in came_from:
-                        path.append(current)
-                        current = came_from[current]
-                    path.append(start)
-                    return path[::-1]
-                
-                # 将当前节点加入关闭列表
-                closed_list.add(current)
-                
-                # 遍历邻居节点
-                for neighbor, weight in graph.get(current, {}).items():
-                    # 如果邻居不在关闭列表中，并且能到达
-                    if neighbor not in closed_list and weight is not None:
-                        new_cost = cost_so_far[current] + weight
-                        # 如果找到更低的成本或邻居不在开放列表中
-                        if (neighbor not in cost_so_far or 
-                           new_cost < cost_so_far[neighbor]):
-                            cost_so_far[neighbor] = new_cost
-                            priority = new_cost + heuristic(neighbor, goal)
-                            heapq.heappush(open_list, (priority, neighbor))
-                            came_from[neighbor] = current
-            
-            # 如果没有路径到达目标
-            return None`;
+        # 如果到达目标节点，重建并返回路径
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+        
+        # 将当前节点加入关闭列表
+        closed_list.add(current)
+        
+        # 遍历邻居节点
+        for neighbor, weight in graph.get(current, {}).items():
+            # 如果邻居不在关闭列表中，并且能到达
+            if neighbor not in closed_list and weight is not None:
+                new_cost = cost_so_far[current] + weight
+                # 如果找到更低的成本或邻居不在开放列表中
+                if (neighbor not in cost_so_far or 
+                    new_cost < cost_so_far[neighbor]):
+                    cost_so_far[neighbor] = new_cost
+                    priority = new_cost + heuristic(neighbor, goal)
+                    heapq.heappush(open_list, (priority, neighbor))
+                    came_from[neighbor] = current
+    
+    # 如果没有路径到达目标
+    return None`;
             break;
         case 'PRM':
-            codeDisplay.textContent = `
-# PRM算法的Python示例代码
-def prm_algorithm(start, goal, k=1000):
-    # 算法实现...
-    pass
+            codeDisplay.textContent = `def generate_random_points(num_points, x_bounds, y_bounds):
+    """在给定的边界内生成随机点"""
+    points = np.random.uniform(low=[x_bounds[0], y_bounds[0]], high=[x_bounds[1], y_bounds[1]], size=(num_points, 2))
+    return points
+
+def create_roadmap(points, distance_threshold):
+    """根据距离阈值连接点"""
+    roadmap = []
+    for i, point1 in enumerate(points):
+        for j, point2 in enumerate(points[i+1:], start=i+1):
+            distance = np.linalg.norm(point1 - point2)
+            if distance <= distance_threshold:
+                roadmap.append((i, j, distance))
+    return roadmap
+
+defprm_planning(start, goal, roadmap):
+    """在PRM图上搜索路径"""
+    # 使用图搜索算法找到路径
+    # 这里省略了图搜索的具体实现
+    path = []
+    return path
 `;
             break;
         case 'RRT':
-            codeDisplay.textContent = `
-# RRT算法的Python示例代码
-def rrt_algorithm(start, goal, max_samples=1000):
-    # 算法实现...
-    pass
+            codeDisplay.textContent = `class Node:
+    def __init__(self, x, y, parent=None):
+        self.x = x
+        self.y = y
+        self.parent = parent
+
+class RRT:
+    def __init__(self, start, goal, max_iter=1000, step_size=1.0, obstacle_list=[]):
+        self.start = Node(start[0], start[1])
+        self.goal = Node(goal[0], goal[1])
+        self.max_iter = max_iter
+        self.step_size = step_size
+        self.obstacle_list = obstacle_list
+        self.tree = [self.start]
+
+    def is_collision(self, node1, node2):
+        for obs in self.obstacle_list:
+            if self.check_collision(node1, node2, obs):
+                return True
+        return False
+
+    def check_collision(self, node1, node2, obs):
+        # 这里简化处理，只考虑圆形障碍物
+        dist = np.sqrt((node1.x - node2.x)**2 + (node1.y - node2.y)**2)
+        return dist < obs[2] + 0.1  # 0.1是安全距离
+
+    def steer(self, from_node, to_point):
+        direction = np.array([to_point[0] - from_node.x, to_point[1] - from_node.y])
+        new_point = from_node.x + direction * min(1, self.step_size / np.linalg.norm(direction))
+        return Node(new_point[0], new_point[1])
+
+    def grow_tree(self):
+        for i in range(self.max_iter):
+            rand_point = np.random.uniform(-10, 10, 2)  # 随机点
+            nearest_node = self.get_nearest_node(rand_point)
+            if not self.is_collision(nearest_node, rand_point):
+                new_node = self.steer(nearest_node, rand_point)
+                if not self.is_collision(new_node, nearest_node):
+                    self.tree.append(new_node)
+                    if np.linalg.norm(np.array([new_node.x, new_node.y]) - np.array([self.goal.x, self.goal.y])) < 1:
+                        return self.reconstruct_path(new_node)
+        return None
+
+    def get_nearest_node(self, point):
+        nearest_node = None
+        min_dist = float('inf')
+        for node in self.tree:
+            dist = np.linalg.norm(np.array([node.x, node.y]) - np.array([point[0], point[1]]))
+            if dist < min_dist:
+                min_dist = dist
+                nearest_node = node
+        return nearest_node
+
+    def reconstruct_path(self, node):
+        path = []
+        while node:
+            path.append((node.x, node.y))
+            node = node.parent
+        return path[::-1]
+
+    def plot_tree(self, path):
+        plt.clf()
+        if path:
+            for i in range(len(path)-1):
+                plt.plot([path[i][0], path[i+1][0]], [path[i][1], path[i+1][1]], 'k-')
+        plt.plot(self.start.x, self.start.y, 'go')
+        plt.plot(self.goal.x, self.goal.y, 'ro')
+        for obs in self.obstacle_list:
+            circle = plt.Circle((obs[0], obs[1]), obs[2], color='k')
+            plt.gca().add_patch(circle)
+        plt.xlim(-15, 15)
+        plt.ylim(-15, 15)
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.draw()
+        plt.pause(0.01)
 `;
             break;
         // 可以根据需要添加更多算法的代码
