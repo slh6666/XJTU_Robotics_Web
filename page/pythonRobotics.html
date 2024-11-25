@@ -26,10 +26,32 @@
                 <div class="experiment-setup">
                     <label for="algorithmSelect">选择算法:</label>
                     <select id="algorithmSelect" class="input-field-algorithmSelect">
-                        <option value="Dijkstra">Dijkstra</option>
+                        <option value="DWA">DWA</option>
                         <option value="A*">A*</option>
-                        <option value="PRM">PRM</option>
-                        <option value="RRT">RRT</option>
+                        <option value="frenet">Frenet</option>
+                        <!-- <option value="bezier">Bezier</option> -->
+                        <!-- <option value="clothoid_path_planner">Clothoid Path Planner</option> -->
+                        <option value="a_star_variants">A* Variants</option>
+                        <option value="a_star_variants_jump_point">A* Variants Jump Point</option>
+                        <option value="a_star_variants_iterative_deepening">A* Variants Iterative Deepening</option>
+                        <option value="a_star_variants_dynamic_weighting">A* Variants Dynamic Weighting</option>
+                        <option value="a_star_variants_use_theta_star">A* Variants Use Theta*</option>
+                        <option value="a_star_variants_all">A* Variants All</option>
+                        <option value="bug0">Bug 0</option>
+                        <option value="bug1">Bug 1</option>
+                        <option value="bug2">Bug 2</option>
+                        <option value="depth_first_search">Depth First Search</option>
+                        <option value="dijkstra">Dijkstra</option>
+                        <option value="bidirectional_a_star">Bidirectional A*</option>
+                        <option value="bidirectional_breadth_first_search">Bidirectional Breadth First Search</option>
+                        <option value="breadth_first_search">Breadth First Search</option>
+                        <option value="greedy_best_first_search">Greedy Best First Search</option>
+                        <option value="rrt">RRT</option>
+                        <option value="rrt_with_pathsmoothing">RRT with Path Smoothing</option>
+                        <option value="rrt_star">RRT*</option>
+                        <option value="dstar">D*</option>
+                        <option value="probabilistic_road_map">Probabilistic Road Map</option>
+                        <option value="potential_field_planning">Potential Field Planning</option>
                     </select>
                     <label for="mapSelect">选择地图:</label>
                     <select id="mapSelect" class="input-field-algorithmSelect">
@@ -51,10 +73,10 @@
                         <label for="endCoord">终点坐标:</label>
                     </div>
                     <div class="coord-inputs">
-                        <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" >
-                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" >
-                        <!-- <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" value="0,0">
-                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" value="10,10"> -->
+                        <!-- <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" >
+                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" > -->
+                        <input type="text" id="startCoord" class="input-field" placeholder="输入起点坐标，如：0,0" value="0,0">
+                        <input type="text" id="endCoord" class="input-field" placeholder="输入终点坐标，如：10,10" value="15,15">
                     </div>
             
                     
@@ -68,8 +90,8 @@
                     <h2>实验区域</h2>
                     
                     <div id="animation-container">
-                        <div id="mapContainer" style="display: none;">
-                            <img src="../maps/map0.png" alt="地图" class="map-image">
+                        <div id="mapContainer">
+                            <img  class="map-image">
                             <div id="clickLayer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
                         </div>
                     </div>

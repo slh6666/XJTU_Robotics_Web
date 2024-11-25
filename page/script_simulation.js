@@ -1,6 +1,6 @@
 /*MQTT通信，数据收发及路径绘制部分 */
 let isRunning = false;// 控制运行状态的标志
-let algorithmflag = '';//后端通信的算法选择标志位
+let algorithmflag = '';//后端通信的算法选择标志位，已弃用
 let mapflag = 0;//后端通信的地图选择标志位
 // 标志变量，初始时不允许自动加载地图
 let isMapLoaded = false;
@@ -100,7 +100,7 @@ function runExperiment() {
                     console.log("解析后的数据: ", data);
                     
                     // 解析 JSON 数据
-                    const { 起点, 目标点, 障碍物, 车辆行使路径 , path} = data;
+                    const {障碍物, 车辆行使路径,参考线,path} = data;
                     if(path == 0){
                         alert("路径规划失败，请重新指定起点终点！");
                     }
@@ -159,7 +159,24 @@ function runExperiment() {
                             currentIndex++;
                         }
                     }).play();
-
+                    参考线.forEach((point, index) => {
+                        if (index > 0) {
+                            // 计算起点和终点的坐标
+                            const [x1, y1] = 参考线[index - 1];
+                            const [x2, y2] = point;
+                    
+                            // 应用缩放因子并偏移13（如果需要）
+                            const scaledX1 = (x1 * scaleFactor) + 13;
+                            const scaledY1 = (y1 * scaleFactor) + 13;
+                            const scaledX2 = (x2 * scaleFactor) + 13;
+                            const scaledY2 = (y2 * scaleFactor) + 13;
+                    
+                            // 绘制线段
+                            const line = two.makeLine(scaledX1, scaledY1, scaledX2, scaledY2);
+                            line.stroke = 'red'; // 设置线段颜色
+                            line.linewidth = 2; // 设置线段宽度
+                        }
+                    });
                     // 标记为已绘制
                     hasDrawn = true;
                     }
@@ -250,34 +267,170 @@ function updateAlgorithmDescription() {
     var codeDescription = document.getElementById('codeDisplay');
 
     switch (selectedAlgorithm) {
-        case 'Dijkstra':
-            algorithmDescription.innerHTML = 'Dijkstra算法是一种图搜索算法，由荷兰计算机科学家艾兹赫尔·Dijkstra在1956年提出。'+
-            '它用于寻找图中两点间的最短路径。算法从起点开始，逐步扩展到邻近节点，更新路径长度，直到到达目标点或所有可达节点都被访问。'+
-            'Dijkstra算法适用于有向图和无向图，且边权重为非负数的情况。它在网络路由、地图导航等领域有广泛应用。由于其高效性，Dijkstra算法是解决最短路径问题的最基本和最知名的算法之一。';
-            algorithmflag = 1;
+        case 'DWA':
+            algorithmDescription.innerHTML = `
+            DWA算法（Dynamic Window Approach）是一种基于动态窗口的局部运动规划算法。
+            它通过在给定的时间窗口内评估机器人的控制输入，选择一个能够最大化目标函数的控制输入。
+            DWA算法考虑了机器人的动态特性和障碍物的存在，能够实时地规划出一条平滑且避障的路径。
+            `;
             break;
+
         case 'A*':
             algorithmDescription.innerHTML = `
-            A*算法是一种启发式搜索算法，用于在图中找到从起始节点到目标节点的最短路径。
-            它结合了Dijkstra算法和最佳优先搜索的特点，使用启发式函数来估计从当前节点到目标节点的成本。
-            A*算法在每一步都选择看似最优的路径，因此它在路径规划和图搜索问题中非常有效，特别是在有明确目标和启发式信息可用的情况下。
+            A*算法是一种启发式搜索算法，用于在图中找到从起始点到目标点的最短路径。
+            它通过评估每个节点的启发式成本（h）和实际成本（g）来选择下一步的最佳路径。
+            A*算法是完备的和最优的，适用于各种路径规划问题，包括二维和三维空间。
             `;
-            algorithmflag = 0;
             break;
-        case 'PRM':
+
+        case 'frenet':
             algorithmDescription.innerHTML = `
-            PRM算法（Probabilistic Roadmap）是一种基于随机采样的路径规划算法。
+            Frenet路径规划是一种基于Frenet坐标系的路径规划方法。
+            它将路径规划问题分解为纵向（速度）和横向（方向）两个独立的子问题。
+            Frenet路径规划特别适用于车辆和机器人的路径规划，因为它能够更好地处理动态障碍物和复杂的交通规则。
+            `;
+            break;
+
+        case 'bezier':
+            algorithmDescription.innerHTML = `
+            Bezier路径规划是一种基于Bezier曲线的平滑路径生成方法。
+            它通过定义曲线的控制点来生成一条平滑的路径，适用于需要精确控制路径形状的场景。
+            Bezier路径规划可以生成复杂且平滑的路径，但可能需要更多的计算资源。
+            `;
+            break;
+
+        case 'clothoid_path_planner':
+            algorithmDescription.innerHTML = `
+            Clothoid路径规划是一种基于clothoid曲线的路径规划方法。
+            Clothoid曲线是一种具有恒定曲率变化率的曲线，适用于生成平滑且连续的路径。
+            Clothoid路径规划特别适用于车辆和机器人的路径规划，因为它能够生成符合车辆动力学特性的路径。
+            `;
+            break;
+
+        case 'a_star_variants':
+            algorithmDescription.innerHTML = `
+            A*变体算法是A*算法的一系列改进和扩展。
+            这些变体包括跳点搜索、迭代深化、动态权重调整和Theta*等。
+            A*变体算法旨在提高A*算法的效率和适用性，解决特定问题或优化特定性能。
+            `;
+            break;
+
+        case 'bug0':
+            algorithmDescription.innerHTML = `
+            BUG0算法是一种基于BUG算法的路径规划方法。
+            它通过在配置空间中搜索一条从起始点到目标点的路径，同时避免障碍物。
+            BUG0算法适用于简单的路径规划问题，但可能在复杂环境中表现不佳。
+            `;
+            break;
+
+        case 'bug1':
+            algorithmDescription.innerHTML = `
+            BUG1算法是BUG0算法的改进版本，它通过引入更多的启发式信息来提高搜索效率。
+            BUG1算法在保持BUG0算法简单性的同时，能够更好地处理复杂环境中的路径规划问题。
+            `;
+            break;
+
+        case 'bug2':
+            algorithmDescription.innerHTML = `
+            BUG2算法是BUG1算法的进一步改进，它通过引入更多的优化技术来提高路径规划的性能。
+            BUG2算法在保持BUG1算法效率的同时，能够生成更加平滑和优化的路径。
+            `;
+            break;
+
+        case 'depth_first_search':
+            algorithmDescription.innerHTML = `
+            深度优先搜索（Depth-First Search, DFS）是一种用于遍历或搜索树或图的算法。
+            它从根节点开始，尽可能深地搜索树的分支，直到找到目标节点或到达叶子节点。
+            DFS算法适用于需要全面搜索的场景，但可能不如广度优先搜索高效。
+            `;
+            break;
+
+        case 'dijkstra':
+            algorithmDescription.innerHTML = `
+            Dijkstra算法是一种用于在加权图中找到单源最短路径的算法。
+            它通过维护一个优先队列来选择下一个最近的节点，直到找到目标节点。
+            Dijkstra算法是贪心算法的典型代表，适用于没有负权重边的图。
+            `;
+            break;
+
+        case 'bidirectional_a_star':
+            algorithmDescription.innerHTML = `
+            双向A*算法是一种A*算法的变体，它从起始点和目标点同时进行搜索。
+            通过同时扩展两个搜索树，双向A*算法能够更快地找到路径，特别是在大规模图中。
+            这种算法适用于需要快速找到路径的场景，但计算量可能较大。
+            `;
+            break;
+
+        case 'bidirectional_breadth_first_search':
+            algorithmDescription.innerHTML = `
+            双向广度优先搜索（Bidirectional Breadth-First Search, BBFS）是一种广度优先搜索的变体。
+            它从起始点和目标点同时进行搜索，通过同时扩展两个搜索队列来加速路径的发现。
+            BBFS适用于需要快速找到路径的场景，特别是在密集图中。
+            `;
+            break;
+
+        case 'breadth_first_search':
+            algorithmDescription.innerHTML = `
+            广度优先搜索（Breadth-First Search, BFS）是一种用于遍历或搜索树或图的算法。
+            它从根节点开始，逐层搜索所有节点，直到找到目标节点。
+            BFS算法适用于需要找到最短路径的场景，但可能不如深度优先搜索深入。
+            `;
+            break;
+
+        case 'greedy_best_first_search':
+            algorithmDescription.innerHTML = `
+            贪婪最佳优先搜索（Greedy Best-First Search）是一种启发式搜索算法。
+            它通过选择具有最低启发式成本的节点来扩展搜索树，直到找到目标节点。
+            贪婪最佳优先搜索适用于目标节点启发式成本较低的场景，但可能不是最优的。
+            `;
+            break;
+
+        case 'rrt':
+            algorithmDescription.innerHTML = `
+            RRT算法（Rapidly-exploring Random Tree）是一种基于随机采样的路径规划算法。
+            它通过在配置空间中随机撒点并连接有效点来构建搜索树，从而将连续空间的路径规划问题转化为离散空间的树搜索问题。
+            RRT算法特别适用于高维空间和复杂约束条件下的路径规划，具有概率完备性，但不是最优的。
+            `;
+            break;
+
+        case 'rrt_with_pathsmoothing':
+            algorithmDescription.innerHTML = `
+            RRT路径平滑算法是一种RRT算法的变体，它在生成路径后对路径进行平滑处理。
+            通过对路径进行后处理，RRT路径平滑算法能够生成更加平滑和优化的路径。
+            这种算法适用于需要生成平滑路径的场景，但计算量可能较大。
+            `;
+            break;
+
+        case 'rrt_star':
+            algorithmDescription.innerHTML = `
+            RRT*算法（Rapidly-exploring Random Tree Star）是一种改进的RRT算法。
+            它通过引入最优性条件和重新规划机制来提高路径的优化程度。
+            RRT*算法在保持RRT算法概率完备性的同时，能够生成更加优化的路径。
+            `;
+            break;
+
+        case 'dstar':
+            algorithmDescription.innerHTML = `
+            D*算法（D-Star）是一种基于动态A*的路径规划算法。
+            它通过动态地更新路径来适应环境的变化，适用于动态环境中的路径规划。
+            D*算法能够快速响应环境变化，但计算量较大，适用于需要实时更新路径的场景。
+            `;
+            break;
+
+        case 'probabilistic_road_map':
+            algorithmDescription.innerHTML = `
+            概率路图（Probabilistic Roadmap, PRM）是一种基于随机采样的路径规划算法。
             它通过在配置空间中随机撒点并连接有效点来构建概率路图，从而将连续空间的路径规划问题转化为离散空间的图搜索问题。
             PRM算法特别适用于高维空间和复杂约束条件下的路径规划，具有概率完备性，但不是最优的。
             它通过较少的随机采样点即可找到一个解，随着采样点的增加，找到路径的概率逐渐趋向于1。
             `;
             break;
-        case 'RRT':
+
+        case 'potential_field_planning':
             algorithmDescription.innerHTML = `
-            RRT算法（Rapidly-exploring Random Tree）是一种用于解决非结构化环境中的路径规划问题的算法。
-            它通过从起点开始，随机选择一个方向和距离进行扩展，逐步构建一棵树状结构，以探索配置空间。
-            RRT算法能够处理复杂的障碍物环境，并能快速找到一个可行的路径，尽管这个路径可能不是最优的。
-            该算法特别适合于动态环境和需要快速响应的场景，如机器人导航和自动驾驶。
+            势场规划（Potential Field Planning）是一种基于势场理论的路径规划方法。
+            它通过在环境中定义吸引势场和排斥势场来引导机器人从起始点移动到目标点。
+            势场规划简单直观，适用于需要快速避障的场景，但可能存在局部最小值问题。
             `;
             break;
         // 可以根据需要添加更多算法的介绍
