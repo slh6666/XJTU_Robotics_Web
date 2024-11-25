@@ -53,13 +53,21 @@ function runExperiment() {
         // 连接成功时的回调
         function onConnect() {
             console.log("Connection Success");
+            //随机生成话题名
+            // 生成一个1到10000之间的随机数
+            var randomNumber = Math.floor(Math.random() * 10000) + 1;
 
+            // 将随机数转换为字符串，并生成话题名
+            var topic_name = "planning" + randomNumber;
+
+            console.log(topic_name);
             // 将数组打包为 JSON 对象
             var dataToSend = {
                 '起点': startCoord,
                 '目标点': endCoord,
                 'code': selectedAlgorithm,
-                'map': mapflag
+                'map': mapflag,
+                'topic_pub':topic_name
             };
 
             // 将 JSON 对象转换为字符串
@@ -71,7 +79,7 @@ function runExperiment() {
             localmsg.destinationName = topic;
             client.send(localmsg);
             console.log("Local Message Send!: ", jsonString);
-            client.subscribe("/planning003");
+            client.subscribe(topic_name);
         }
 
         // 连接失败时的回调
@@ -159,24 +167,26 @@ function runExperiment() {
                             currentIndex++;
                         }
                     }).play();
-                    参考线.forEach((point, index) => {
-                        if (index > 0) {
-                            // 计算起点和终点的坐标
-                            const [x1, y1] = 参考线[index - 1];
-                            const [x2, y2] = point;
-                    
-                            // 应用缩放因子并偏移13（如果需要）
-                            const scaledX1 = (x1 * scaleFactor) + 13;
-                            const scaledY1 = (y1 * scaleFactor) + 13;
-                            const scaledX2 = (x2 * scaleFactor) + 13;
-                            const scaledY2 = (y2 * scaleFactor) + 13;
-                    
-                            // 绘制线段
-                            const line = two.makeLine(scaledX1, scaledY1, scaledX2, scaledY2);
-                            line.stroke = 'red'; // 设置线段颜色
-                            line.linewidth = 2; // 设置线段宽度
-                        }
-                    });
+                    if(selectedAlgorithm == 'frenet'){
+                        参考线.forEach((point, index) => {
+                            if (index > 0) {
+                                // 计算起点和终点的坐标
+                                const [x1, y1] = 参考线[index - 1];
+                                const [x2, y2] = point;
+                        
+                                // 应用缩放因子并偏移13（如果需要）
+                                const scaledX1 = (x1 * scaleFactor) + 13;
+                                const scaledY1 = (y1 * scaleFactor) + 13;
+                                const scaledX2 = (x2 * scaleFactor) + 13;
+                                const scaledY2 = (y2 * scaleFactor) + 13;
+                        
+                                // 绘制线段
+                                const line = two.makeLine(scaledX1, scaledY1, scaledX2, scaledY2);
+                                line.stroke = 'red'; // 设置线段颜色
+                                line.linewidth = 2; // 设置线段宽度
+                            }
+                        });
+                    }
                     // 标记为已绘制
                     hasDrawn = true;
                     }
